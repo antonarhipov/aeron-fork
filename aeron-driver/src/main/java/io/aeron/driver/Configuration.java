@@ -332,6 +332,18 @@ public final class Configuration
     public static final int SOCKET_MULTICAST_TTL_DEFAULT = 0;
 
     /**
+     * Property name for IP_TOS setting on UDP sockets which can be used to prioritize network traffic.
+     */
+    @Config
+    public static final String SOCKET_IP_TOS_PROP_NAME = "aeron.socket.ip_tos";
+
+    /**
+     * IP_TOS value, 0 means use OS default.
+     */
+    @Config
+    public static final int SOCKET_IP_TOS_DEFAULT = 0;
+
+    /**
      * Property name for linger timeout after draining on {@link Publication}s so they can respond to NAKs.
      */
     @Config
@@ -1602,6 +1614,17 @@ public final class Configuration
     public static int socketMulticastTtl()
     {
         return getInteger(SOCKET_MULTICAST_TTL_PROP_NAME, SOCKET_MULTICAST_TTL_DEFAULT);
+    }
+
+    /**
+     * IP_TOS setting on UDP sockets which can be used to prioritize network traffic.
+     *
+     * @return IP_TOS setting on UDP sockets.
+     * @see #SOCKET_IP_TOS_PROP_NAME
+     */
+    public static int socketIpTos()
+    {
+        return getInteger(SOCKET_IP_TOS_PROP_NAME, SOCKET_IP_TOS_DEFAULT);
     }
 
     /**
