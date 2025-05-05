@@ -492,6 +492,7 @@ public final class MediaDriver implements AutoCloseable
         private int socketSndbufLength = Configuration.socketSndbufLength();
         private int socketRcvbufLength = Configuration.socketRcvbufLength();
         private int socketMulticastTtl = Configuration.socketMulticastTtl();
+        private int socketIpTos = Configuration.socketIpTos();
         private int mtuLength = Configuration.mtuLength();
         private int ipcMtuLength = Configuration.ipcMtuLength();
         private int filePageSize = Configuration.filePageSize();
@@ -1906,6 +1907,31 @@ public final class MediaDriver implements AutoCloseable
         public Context socketMulticastTtl(final int ttl)
         {
             socketMulticastTtl = ttl;
+            return this;
+        }
+
+        /**
+         * The IP_TOS value to be used for sockets which can be used to prioritize network traffic.
+         *
+         * @return IP_TOS value to be used for sockets.
+         * @see Configuration#SOCKET_IP_TOS_PROP_NAME
+         */
+        @Config
+        public int socketIpTos()
+        {
+            return socketIpTos;
+        }
+
+        /**
+         * IP_TOS value to be used for sockets which can be used to prioritize network traffic.
+         *
+         * @param tos value to be used for sockets.
+         * @return this for a fluent API.
+         * @see Configuration#SOCKET_IP_TOS_PROP_NAME
+         */
+        public Context socketIpTos(final int tos)
+        {
+            socketIpTos = tos;
             return this;
         }
 

@@ -243,6 +243,17 @@ public abstract class UdpChannelTransport implements AutoCloseable
                 receiveDatagramChannel.setOption(SO_RCVBUF, socketRcvbufLength());
             }
 
+            if (udpChannel.hasIpTos())
+            {
+                sendDatagramChannel.setOption(StandardSocketOptions.IP_TOS, udpChannel.socketIpTos());
+                receiveDatagramChannel.setOption(StandardSocketOptions.IP_TOS, udpChannel.socketIpTos());
+            }
+            else if (0 != context.socketIpTos())
+            {
+                sendDatagramChannel.setOption(StandardSocketOptions.IP_TOS, context.socketIpTos());
+                receiveDatagramChannel.setOption(StandardSocketOptions.IP_TOS, context.socketIpTos());
+            }
+
             sendDatagramChannel.configureBlocking(false);
             receiveDatagramChannel.configureBlocking(false);
         }

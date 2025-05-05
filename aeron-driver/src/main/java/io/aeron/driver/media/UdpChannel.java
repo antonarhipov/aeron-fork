@@ -55,9 +55,11 @@ public final class UdpChannel
     private final boolean isMulticast;
     private final boolean hasMulticastTtl;
     private final boolean hasTag;
+    private final boolean hasIpTos;
     private final int multicastTtl;
     private final int socketRcvbufLength;
     private final int socketSndbufLength;
+    private final int socketIpTos;
     private final int receiverWindowLength;
     private final long tag;
     private final InetSocketAddress remoteData;
@@ -83,6 +85,7 @@ public final class UdpChannel
         hasTag = context.hasTagId;
         tag = context.tagId;
         hasMulticastTtl = context.hasMulticastTtl;
+        hasIpTos = context.hasIpTos;
         multicastTtl = context.multicastTtl;
         remoteData = context.remoteData;
         localData = context.localData;
@@ -95,6 +98,7 @@ public final class UdpChannel
         channelUri = context.channelUri;
         socketRcvbufLength = context.socketRcvbufLength;
         socketSndbufLength = context.socketSndbufLength;
+        socketIpTos = context.socketIpTos;
         receiverWindowLength = context.receiverWindowLength;
         channelReceiveTimestampOffset = context.channelReceiveTimestampOffset;
         channelSendTimestampOffset = context.channelSendTimestampOffset;
@@ -156,6 +160,15 @@ public final class UdpChannel
             final int receiverWindowLength = parseBufferLength(
                 channelUri, RECEIVER_WINDOW_LENGTH_PARAM_NAME);
 
+            int socketIpTos = 0;
+            boolean hasIpTos = false;
+            final String ipTosValue = channelUri.get(SOCKET_IP_TOS_PARAM_NAME);
+            if (null != ipTosValue)
+            {
+                socketIpTos = Integer.parseInt(ipTosValue);
+                hasIpTos = true;
+            }
+
             final boolean requiresAdditionalSuffix = !isDestination &&
                 (null == endpointAddress && null == controlAddress ||
                 (null != endpointAddress && endpointAddress.getPort() == 0) ||
@@ -201,6 +214,7 @@ public final class UdpChannel
                 .hasExplicitControl(false)
                 .hasMulticastTtl(false)
                 .hasTagId(false)
+                .hasIpTos(hasIpTos)
                 .uriStr(channelUriString)
                 .channelUri(channelUri)
                 .controlMode(controlMode)
@@ -208,6 +222,7 @@ public final class UdpChannel
                 .hasNoDistinguishingCharacteristic(hasNoDistinguishingCharacteristic)
                 .socketRcvbufLength(socketRcvbufLength)
                 .socketSndbufLength(socketSndbufLength)
+                .socketIpTos(socketIpTos)
                 .receiverWindowLength(receiverWindowLength)
                 .nakDelayNs(parseOptionalDurationNs(channelUri, NAK_DELAY_PARAM_NAME));
 
@@ -741,6 +756,37 @@ public final class UdpChannel
     }
 
     /**
+     * Has this channel got an IP_TOS value set so that {@link #socketIpTos()} is valid.
+     *
+     * @return true if this channel has an IP_TOS set otherwise false.
+     */
+    public boolean hasIpTos()
+    {
+        return hasIpTos;
+    }
+
+    /**
+     * IP_TOS value.
+     *
+     * @return IP_TOS value.
+     */
+    public int socketIpTos()
+    {
+        return socketIpTos;
+    }
+
+    /**
+     * Get the socket IP_TOS value.
+     *
+     * @param defaultValue to be used if the UdpChannel's value is 0 (unspecified).
+     * @return socket IP_TOS value or defaultValue if not specified.
+     */
+    public int socketIpTosOrDefault(final int defaultValue)
+    {
+        return 0 != socketIpTos ? socketIpTos : defaultValue;
+    }
+
+    /**
      * Get the receiver window length used as the initial window length for congestion control.
      *
      * @return receiver window length or 0 if not specified.
@@ -1153,9 +1199,11 @@ public final class UdpChannel
         boolean isMulticast = false;
         boolean hasMulticastTtl = false;
         boolean hasTagId = false;
+        boolean hasIpTos = false;
         boolean hasNoDistinguishingCharacteristic = false;
         int socketRcvbufLength = 0;
         int socketSndbufLength = 0;
+        int socketIpTos = 0;
         int receiverWindowLength = 0;
         int multicastTtl;
         long tagId;
@@ -1278,6 +1326,12 @@ public final class UdpChannel
             return this;
         }
 
+        Context hasIpTos(final boolean hasIpTos)
+        {
+            this.hasIpTos = hasIpTos;
+            return this;
+        }
+
         Context hasNoDistinguishingCharacteristic(final boolean hasNoDistinguishingCharacteristic)
         {
             this.hasNoDistinguishingCharacteristic = hasNoDistinguishingCharacteristic;
@@ -1293,6 +1347,12 @@ public final class UdpChannel
         Context socketSndbufLength(final int socketSndbufLength)
         {
             this.socketSndbufLength = socketSndbufLength;
+            return this;
+        }
+
+        Context socketIpTos(final int socketIpTos)
+        {
+            this.socketIpTos = socketIpTos;
             return this;
         }
 
